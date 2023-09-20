@@ -3,16 +3,20 @@ package example
 import Array._
 import scalafx.Includes._
 import scalafx.application.JFXApp3
-import scalafx.scene._ // Node, Scene
-import scalafx.scene.paint.Color._ // SeaGreen, AntiqueWhite
+import scalafx.scene.Scene
+import scalafx.scene.paint.Color._ // SeaGreen, AntiqueWhite, DimGray, SteelBlue, IndianRed
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.layout.GridPane
 import scalafx.scene.text.Text
 import scalafx.animation.AnimationTimer
-import scalafx.scene.input._ // KeyEvent, KeyCode
+import scalafx.scene.input.KeyEvent
+import scalafx.scene.input.KeyCode
 import scalafx.scene.text.Font
 import scalafx.scene.text.FontWeight
 import scalafx.scene.text.FontPosture
+import scalafx.scene.layout.HBox
+import scalafx.scene.control.Button
+import scalafx.scene.Group
 
 object SnakeFx extends JFXApp3 {
 
@@ -41,8 +45,8 @@ object SnakeFx extends JFXApp3 {
   }
 
   def randomCoordsInScene(): (Double, Double) = {
-    val x = (math.random() * w / cellWidth).toInt * cellWidth
-    val y = (math.random() * h / cellWidth).toInt * cellWidth
+    val x = (math.random() * (w - cellWidth) / cellWidth).toInt * cellWidth
+    val y = (math.random() * (h - cellWidth) / cellWidth).toInt * cellWidth
     (x, y)
   }
 
@@ -117,15 +121,52 @@ object SnakeFx extends JFXApp3 {
       scene = new Scene {
         fill = AntiqueWhite
         var gameOver = false
+        var lastTimestamp = System.nanoTime()
+        var frameNumber: Int = 0
         var score = 0
-        val gameOverModal = new Text {
-          font = Font("Arial", FontWeight.ExtraBold, FontPosture.Regular, 48)
-          text = "Game Over"
-          fill = DimGray
-          x = 70
-          y = 70
+        var currDirection = SnakeDirection.Left
+
+        val gameOverModal: Group = new Group {
           visible = false
+          children = List(
+            new Text {
+              font =
+                Font("Arial", FontWeight.ExtraBold, FontPosture.Regular, 48)
+              text = "Game Over Bobo"
+              fill = DimGray
+              x = 70
+              y = 70
+            },
+            new Button {
+              text = "Restart"
+              layoutX = 100
+              layoutY = 100
+              onAction = () => {
+                snake = Array(0, 1, 2).map(i => {
+                  val bodyPart =
+                    Rectangle(
+                      w / 2 + i * cellWidth,
+                      h / 2,
+                      cellWidth,
+                      cellWidth
+                    )
+                  bodyPart.fill = SeaGreen
+                  bodyPart
+                })
+                val (x, y) = randomCoordsInScene
+                fruit(0).x = x
+                fruit(0).y = y
+                gameOver = false
+                lastTimestamp = System.nanoTime()
+                frameNumber = 0
+                score = 0
+                currDirection = SnakeDirection.Left
+                gameOverModal.visible = false
+              }
+            }
+          )
         }
+
         val scoreModal = new Text {
           font = Font("Arial", FontWeight.ExtraBold, FontPosture.Regular, 20)
           text = "Score: " + score
@@ -137,7 +178,6 @@ object SnakeFx extends JFXApp3 {
 
         content = snake ++ fruit ++ Array(gameOverModal) ++ Array(scoreModal)
 
-        var currDirection = SnakeDirection.Left
         onKeyPressed = (e: KeyEvent) => {
           if (e.code == KeyCode.Up)
             currDirection =
@@ -157,10 +197,7 @@ object SnakeFx extends JFXApp3 {
               else currDirection
         }
 
-        var lastTimestamp = System.nanoTime()
-        val frameNumber: Int = 0
-        val animator = AnimationTimer(t => {
-
+        AnimationTimer(t => {
           if (gameOver) {
             gameOverModal.visible = true
           } else {
@@ -168,13 +205,15 @@ object SnakeFx extends JFXApp3 {
             if (dt >= 1) {
               updateSnake(currDirection)
               val result = checkCollisions(currDirection)
-              if (result < 0) gameOver = true
-              score += result
-              frameNumber + 1
-              lastTimestamp = t
+              if (result < 0) {
+                gameOver = true
+              } else {
+                score += result
+                frameNumber + 1
+                lastTimestamp = t
+              }
             }
           }
-
           scoreModal.text = "Score: " + score
           content = snake ++ fruit ++ Array(gameOverModal) ++ Array(scoreModal)
         }).start
