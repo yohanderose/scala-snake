@@ -30,6 +30,19 @@ object SnakeFx extends JFXApp3 {
     })
   }
 
+  val fruit: Array[Rectangle] = {
+    val (x, y) = randomCoordsInScene()
+    val fruit = Rectangle(x, y, cellWidth, cellWidth)
+    fruit.fill = IndianRed
+    Array(fruit)
+  }
+
+  def randomCoordsInScene(): (Double, Double) = {
+    val x = (math.random() * w / cellWidth).toInt * cellWidth
+    val y = (math.random() * h / cellWidth).toInt * cellWidth
+    (x, y)
+  }
+
   def updateSnake(dir: (Double, Double) => (Double, Double)): Unit = {
     // println("tick")
     for (i <- (1 until snake.length).reverse) {
@@ -41,11 +54,31 @@ object SnakeFx extends JFXApp3 {
     snake(0).y = newY
   }
 
-  val board = {
-    snake ++
-      Array(new Text(30, 60, "Hello again")) ++
-      Array(new Text(30, 90, "Hello again!!!!"))
+  def extendSnakeTail(dir: (Double, Double) => (Double, Double)): Unit = {
+    val newBodyPart =
+      Rectangle(
+        if (dir == SnakeDirection.Left) snake.last.x() + cellWidth
+        else snake.last.x() - cellWidth,
+        snake.last.y(),
+        cellWidth,
+        cellWidth
+      )
+    newBodyPart.fill = SeaGreen
+    snake :+= newBodyPart
+  }
 
+  def checkCollisions(dir: (Double, Double) => (Double, Double)): Unit = {
+    if (
+      snake(0).x() == fruit(0).x() &&
+      snake(0).y() == fruit(0).y()
+    ) {
+      println("Eating fruit")
+      extendSnakeTail(dir)
+
+      val (x, y) = randomCoordsInScene()
+      fruit(0).x = x
+      fruit(0).y = y
+    }
   }
 
   override def start(): Unit = {
@@ -55,7 +88,7 @@ object SnakeFx extends JFXApp3 {
       height = h
       scene = new Scene {
         fill = AntiqueWhite
-        content = snake
+        content = snake ++ fruit
 
         var currDirection = SnakeDirection.Left
         onKeyPressed = (e: KeyEvent) => {
@@ -83,6 +116,8 @@ object SnakeFx extends JFXApp3 {
           val dt = (t - lastTimestamp) / 1e8 // change in time in seconds
           if (dt >= 1) {
             updateSnake(currDirection)
+            checkCollisions(currDirection)
+            content = snake ++ fruit
             frameNumber + 1
             lastTimestamp = t
           }
