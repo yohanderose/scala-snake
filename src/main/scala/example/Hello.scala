@@ -132,7 +132,7 @@ object SnakeFx extends JFXApp3 {
             new Text {
               font =
                 Font("Arial", FontWeight.ExtraBold, FontPosture.Regular, 48)
-              text = "Game Over Bobo"
+              text = "Game Over"
               fill = DimGray
               x = 70
               y = 70
