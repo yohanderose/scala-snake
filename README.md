@@ -1,16 +1,10 @@
-# Title
+# Snake Game
 
-Brief introduction, who what where when why
+Practical learning resource for backend onboarding at Agoda.
 
 <p align="center">
-    <img width="200"src="docs/mob1.png">
-    <img width="200" src="docs/mob2.png">
-    <img width="200"src="docs/mob3.png">
+    <img width=""src="https://github.com/yohanderose/gifs/blob/master/snake.gif?raw=true">
 </p>
-
-## Features 🚀
-
-- feature
 
 ## Dependencies :package:
 
@@ -20,22 +14,26 @@ Brief introduction, who what where when why
 
 ## Install & Run 🛠️
 
-1. Clone and
+0. Download and unpack a JDK with JavaFX (see [dependencies](#Dependencies)), Azul is recommended.
+
+1. You'll need to add the unpacked location to `$PATH` and sometimes set it to `$JAVA_HOME` environment variable.
+
+2. Clone this repo, navigate inside and
 
 ```bash
-git clone https://github.com/...
+sbt run
 ```
 
-## ️️ Common Issues and FAQ :pushpin:
+<!-- ## ️️ Common Issues and FAQ :pushpin: -->
 
-<details>
-    <summary>Toggle Switch</summary>
-    Foldable Content[enter image description here][1]
-</details>
+<!-- <details> -->
+<!--     <summary>Toggle Switch</summary> -->
+<!--     Foldable Content[enter image description here][1] -->
+<!-- </details> -->
 
 ## ️️ Upcoming Features :construction:
 
-- [ ] new feature
+- [ ] black starter project and separate solution
 
 <h2 align="center">Contact</h2>
 <p align='center'>
